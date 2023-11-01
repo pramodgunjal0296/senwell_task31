@@ -1,0 +1,31 @@
+tr {
+  background-color: white;
+  border: 1px solid gray;
+  color: black;
+  font-size: 18px;
+}
+
+tr {
+  background-color: white;
+  border: 1px solid gray;
+  color: black;
+  font-size: 18px;
+}
+
+tr:hover {
+  background-color: lightgray;
+}
+
+th {
+  padding-left: 2%;
+
+  font-weight: 500;
+
+  color: #1a202c;
+
+  border: 1px solid gray;
+}
+
+.desc {
+  padding: 10px;
+}
