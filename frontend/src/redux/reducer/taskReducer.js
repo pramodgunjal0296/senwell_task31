@@ -6,24 +6,27 @@ import {
   GET_TASK_FAILURE,
   GET_TASK_SUCCESS,
   REMOVE_TASK,
-  REMOVE_TASK_FAILURE,
-  REMOVE_TASK_SUCCESS,
   UPDATE_TASK,
-  UPDATE_TASK_FAILURE,
-  UPDATE_TASK_SUCCESS,
 } from "../action/type";
 
 const initialState = {
   tasks: [],
+  isLoading: false,
+  error: null,
+  deletedTaskId: null,
 };
 const taskReducer = (state = initialState, action) => {
   switch (action.type) {
     case GET_TASK:
-      return { ...state };
+      return { ...state, isLoading: true, error: null };
     case GET_TASK_SUCCESS:
-      return { ...state, tasks: action.payload.data };
+      return { ...state, tasks: action.payload, isLoading: false, error: null };
     case GET_TASK_FAILURE:
-      return { ...state };
+      return {
+        ...state,
+        isLoading: false,
+        error: "An error occurred while fetching tasks.",
+      };
     case ADD_TASK:
       return {
         ...state,
@@ -31,30 +34,28 @@ const taskReducer = (state = initialState, action) => {
     case ADD_TASK_SUCCESS:
       return {
         ...state,
-        tasks: action.payload.data,
+        tasks: action.payload,
+        // tasks: state.tasks.filter((item) => item._id !== action.payload),
       };
     case ADD_TASK_FAILURE:
       return {
         ...state,
       };
     case UPDATE_TASK:
-      return { ...state };
-    case UPDATE_TASK_SUCCESS:
+      const updatedTasks = state.tasks.map((task) =>
+        task._id === action.payload._id ? action.payload : task
+      );
       return {
         ...state,
-        tasks: state.tasks.filter((item) => item._id !== action.payload),
+        tasks: updatedTasks,
       };
-    case UPDATE_TASK_FAILURE:
-      return { ...state };
     case REMOVE_TASK:
-      return { ...state };
-    case REMOVE_TASK_SUCCESS:
       return {
         ...state,
+        deletedTaskId: action.payload,
+
         tasks: state.tasks.filter((item) => item._id !== action.payload),
       };
-    case REMOVE_TASK_FAILURE:
-      return { ...state };
 
     default:
       return state;

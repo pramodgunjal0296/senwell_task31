@@ -3,15 +3,18 @@ import "../App.css";
 import { RiFileEditLine } from "react-icons/ri";
 import { AiTwotoneDelete } from "react-icons/ai";
 import { ImCross } from "react-icons/im";
-import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addTask, getTask } from "../redux/action/taskAction";
+import {
+  addTask,
+  getTask,
+  updateTask,
+  deleteTask,
+} from "../redux/action/taskAction";
+import { toast } from "react-toastify";
 
 const TaskList = () => {
-  // const [tasks, setTasks] = useState([]);
-  // const [newTask, setNewTask] = useState({ title: "", description: "" });
   const [editingTask, setEditingTask] = useState(null);
 
   const navigate = useNavigate();
@@ -20,10 +23,7 @@ const TaskList = () => {
 
   useEffect(() => {
     dispatch(getTask());
-    // axios.get("http://localhost:5000/tasks").then((response) => {
-    //   setTasks(response.data);
-    // });
-  }, []);
+  }, [tasks]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,42 +31,28 @@ const TaskList = () => {
     dispatch(addTask(data));
   };
 
-  // const addTask = () =>
-  //   axios.post("http://localhost:5000/tasks", newTask).then((response) => {
-  //     if (response.status === 400) {
-  //       alert("Empty fields not allowed");
-  //     } else {
-  //       setTasks([...tasks, response.data]);
-  //       setNewTask({ title: "", description: "" });
-  //       alert("Task added Successfully");
-  //     }
-  //   });
-  // };
-
   const startEditing = (task) => {
-    setEditingTask(task); // Set the task to be edited
+    setEditingTask(task);
   };
 
   const cancelEditing = () => {
-    setEditingTask(null); // Clear the editing task
+    setEditingTask(null);
   };
 
-  const saveTask = (task) => {
-    axios.put(`http://localhost:5000/tasks/${task._id}`, task).then(() => {
+  const handleUpdate = (updatedData) => {
+    dispatch(updateTask(updatedData)).then(() => {
       setEditingTask(null);
-      alert("Task Saved Successfully ,Please Refresh to see updated task");
+      alert("Task Updated Successfully");
     });
   };
 
-  const deleteTask = (taskId) => {
-    axios.delete(`http://localhost:5000/tasks/${taskId}`).then(() => {
-      // setTasks(tasks.filter((task) => task._id !== taskId));
-      alert("Task deleted Successfully");
-    });
+  const handleDelete = (taskId) => {
+    dispatch(deleteTask(taskId));
   };
   const handleLogout = () => {
     Cookies.remove("task||userInfo");
     navigate("/login");
+    toast.warn("Log out Successfully");
   };
 
   return (
@@ -93,10 +79,6 @@ const TaskList = () => {
                 name="title"
                 className="shadow appearance-none border  border-gray-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
                 placeholder="Title"
-                // value={newTask.title}
-                // onChange={(e) =>
-                //   setNewTask({ ...newTask, title: e.target.value })
-                // }
                 required
               />
               <p className="text-red-600">*</p>
@@ -108,10 +90,6 @@ const TaskList = () => {
               rows="4"
               className="block p-2.5 mb-5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Description"
-              // value={newTask.description}
-              // onChange={(e) =>
-              //   setNewTask({ ...newTask, description: e.target.value })
-              // }
             ></textarea>
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -167,7 +145,7 @@ const TaskList = () => {
                     <td>
                       <button
                         className="bg-blue-500 hover:bg-blue-700   text-white font-bold py-2 px-4 mt-1 mb-1 rounded"
-                        onClick={() => saveTask(editingTask)}
+                        onClick={(e) => handleUpdate(editingTask)}
                         title="save your task"
                       >
                         Save
@@ -203,7 +181,7 @@ const TaskList = () => {
                     <td>
                       <button
                         className="bg-red-700 hover:bg-red-500 text-white font-bold py-2 px-4 mt-1 ml-4 rounded"
-                        onClick={() => deleteTask(task._id)}
+                        onClick={() => handleDelete(task._id)}
                         title="Delete Task"
                       >
                         <AiTwotoneDelete />

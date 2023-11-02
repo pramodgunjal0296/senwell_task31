@@ -25,8 +25,8 @@ export const loginRequest = (payload) => async (dispatch) => {
       Cookies.set("task||userInfo", res.data.token, {
         expires: 30,
       });
-      toast.success("Logged In!");
       payload.callback();
+      toast.success("Logged In!");
     }
   } catch (error) {
     dispatch({
